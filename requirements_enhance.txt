@@ -1,0 +1,7 @@
+flask
+torch
+opencv-python
+Pillow
+numpy
+werkzeug
+git+https://github.com/xinntao/Real-ESRGAN.git
