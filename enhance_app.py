@@ -131,7 +131,16 @@ def enhance_image():
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+    # البحث في المجلدين
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    output_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
+    
+    if os.path.exists(output_path):
+        return send_file(output_path, as_attachment=True)
+    elif os.path.exists(upload_path):
+        return send_file(upload_path, as_attachment=True)
+    else:
+        return jsonify({'error': 'الملف غير موجود'}), 404
 
 @app.route('/outputs/<filename>')
 def output_file(filename):

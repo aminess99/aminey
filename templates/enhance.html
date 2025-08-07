@@ -491,7 +491,12 @@
         function displayResults(originalUrl, enhancedUrl) {
             originalImage.src = originalUrl;
             enhancedImage.src = enhancedUrl;
-            downloadBtn.href = enhancedUrl;
+            
+            // استخراج اسم الملف من الرابط وإنشاء رابط التحميل
+            const filename = enhancedUrl.split('/').pop();
+            downloadBtn.href = '/download/' + filename;
+            downloadBtn.download = filename;
+            
             resultsSection.style.display = 'block';
             
             // التمرير إلى النتائج
