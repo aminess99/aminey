@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, send_from_directory, jsonify, url_for
+from flask import Flask, request, render_template, send_from_directory, send_file, jsonify, url_for
 from PIL import Image
 import cv2
 import numpy as np
@@ -133,19 +133,20 @@ def enhance_image():
 def download_file(filename):
     return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
 
-@app.route('/api/status')
-def health_check():
-    return {'status': 'healthy', 'service': 'image-enhancement-api'}
-
 @app.route('/outputs/<filename>')
 def output_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 @app.route('/api/status')
-def status():
+def health_check():
     """التحقق من حالة الخدمة"""
     return jsonify({
-        'status': 'running',
+        'status': 'healthy',
+        'service': 'image-enhancement-api',
         'gpu_available': torch.cuda.is_available(),
         'device': 'cuda' if torch.cuda.is_available() else 'cpu'
     })
