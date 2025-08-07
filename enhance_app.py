@@ -129,9 +129,13 @@ def enhance_image():
     
     return jsonify({'error': 'نوع الملف غير مدعوم'}), 400
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+
+@app.route('/api/status')
+def health_check():
+    return {'status': 'healthy', 'service': 'image-enhancement-api'}
 
 @app.route('/outputs/<filename>')
 def output_file(filename):
