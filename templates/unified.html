@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الذكاء الاصطناعي - تحسين الصور وتحويل النص إلى كلام</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9ff;
+            border-bottom: 3px solid #eee;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            background: white;
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .nav-tab:hover {
+            background: #f0f2ff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 30px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ecff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-text p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #eee;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .image-container {
+            text-align: center;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .image-container h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .image-comparison {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 منصة الذكاء الاصطناعي</h1>
+            <p>تحسين الصور وتحويل النص إلى كلام - مجاناً وبدون حدود</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('image-enhancement')">
+                🖼️ تحسين الصور
+            </button>
+            <button class="nav-tab" onclick="switchTab('text-to-speech')">
+                🎤 تحويل النص إلى كلام
+            </button>
+        </div>
+
+        <!-- تبويب تحسين الصور -->
+        <div class="tab-content active" id="image-enhancement">
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h4>تحسين الدقة</h4>
+                    <p>زيادة دقة الصورة بـ 2x</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h4>سريع</h4>
+                    <p>معالجة فورية للصور</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h4>آمن</h4>
+                    <p>يتم حذف صورك تلقائياً</p>
+                </div>
+            </div>
+
+            <form id="image-form" enctype="multipart/form-data">
+                <div class="upload-area" id="image-upload-area">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">
+                        <h3>اسحب صورتك هنا أو انقر للاختيار</h3>
+                        <p>يدعم: JPG, PNG, GIF, BMP, WEBP (حد أقصى 16 ميجابايت)</p>
+                    </div>
+                    <input type="file" id="image-input" name="image" accept="image/*" style="display: none;" required>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button type="button" class="btn" onclick="document.getElementById('image-input').click()">
+                        🖼️ اختر صورة
+                    </button>
+                    <button type="submit" class="btn" id="enhance-btn" disabled>
+                        ✨ حسّن الصورة
+                    </button>
+                </div>
+            </form>
+
+            <div class="progress-bar" id="image-progress-bar">
+                <div class="progress-fill" id="image-progress-fill"></div>
+            </div>
+
+            <div class="loading" id="image-loading">
+                جاري تحسين الصورة، انتظر قليلاً...
+            </div>
+
+            <div class="alert alert-success" id="image-success-alert"></div>
+            <div class="alert alert-error" id="image-error-alert"></div>
+
+            <div class="results-section" id="image-results-section">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">نتيجة التحسين</h3>
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <h4>الصورة الأصلية</h4>
+                        <img id="original-image" alt="الصورة الأصلية">
+                    </div>
+                    <div class="image-container">
+                        <h4>الصورة المحسنة</h4>
+                        <img id="enhanced-image" alt="الصورة المحسنة">
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <a href="#" class="btn" id="download-btn" download style="background: linear-gradient(45deg, #28a745, #20c997);">
+                        📥 تحميل الصورة المحسنة
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب تحويل النص إلى كلام -->
+        <div class="tab-content" id="text-to-speech">
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h4>جودة عالية</h4>
+                    <p>صوت طبيعي ومفهوم</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎭</div>
+                    <h4>تحكم بالمشاعر</h4>
+                    <p>تعديل نبرة الصوت</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔄</div>
+                    <h4>استنساخ الصوت</h4>
+                    <p>استخدم صوتك الخاص</p>
+                </div>
+            </div>
+
+            <!-- النموذج الأساسي لتحويل النص -->
+            <form id="tts-form">
+                <div class="form-group">
+                    <label for="text-input">النص المراد تحويله إلى كلام:</label>
+                    <textarea id="text-input" name="text" placeholder="اكتب النص هنا... (حد أقصى 1000 حرف)" maxlength="1000" required></textarea>
+                    <small style="color: #666;">عدد الأحرف: <span id="char-count">0</span>/1000</small>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button type="submit" class="btn" id="tts-btn">
+                        🎤 تحويل إلى كلام
+                    </button>
+                </div>
+            </form>
+
+            <!-- النموذج المتقدم مع الصوت المرجعي -->
+            <div style="margin-top: 40px; padding-top: 40px; border-top: 2px solid #eee;">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">التحويل باستخدام صوت مرجعي</h3>
+                
+                <form id="tts-voice-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="text-voice-input">النص المراد تحويله:</label>
+                        <textarea id="text-voice-input" name="text" placeholder="اكتب النص هنا... (حد أقصى 1000 حرف)" maxlength="1000" required></textarea>
+                        <small style="color: #666;">عدد الأحرف: <span id="char-voice-count">0</span>/1000</small>
+                    </div>
+
+                    <div class="upload-area" id="audio-upload-area">
+                        <div class="upload-icon">🎵</div>
+                        <div class="upload-text">
+                            <h3>اسحب ملف صوتي هنا أو انقر للاختيار</h3>
+                            <p>يدعم: WAV, MP3, FLAC, M4A (حد أقصى 16 ميجابايت)</p>
+                        </div>
+                        <input type="file" id="audio-input" name="audio" accept="audio/*" style="display: none;" required>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button type="button" class="btn" onclick="document.getElementById('audio-input').click()">
+                            🎵 اختر ملف صوتي
+                        </button>
+                        <button type="submit" class="btn" id="tts-voice-btn" disabled>
+                            🎭 تحويل بالصوت المرجعي
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="progress-bar" id="tts-progress-bar">
+                <div class="progress-fill" id="tts-progress-fill"></div>
+            </div>
+
+            <div class="loading" id="tts-loading">
+                جاري تحويل النص إلى كلام، انتظر قليلاً...
+            </div>
+
+            <div class="alert alert-success" id="tts-success-alert"></div>
+            <div class="alert alert-error" id="tts-error-alert"></div>
+
+            <div class="results-section" id="tts-results-section">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">نتيجة التحويل</h3>
+                <div style="text-align: center;">
+                    <audio controls class="audio-player" id="tts-audio">
+                        <source id="tts-audio-source" type="audio/wav">
+                        متصفحك لا يدعم تشغيل الملفات الصوتية
+                    </audio>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#" class="btn" id="tts-download-btn" download style="background: linear-gradient(45deg, #28a745, #20c997);">
+                        📥 تحميل الملف الصوتي
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إدارة التبويبات
+        function switchTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // إظهار التبويب المطلوب
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // إخفاء النتائج
+            hideAllResults();
+        }
+
+        function hideAllResults() {
+            document.getElementById('image-results-section').style.display = 'none';
+            document.getElementById('tts-results-section').style.display = 'none';
+            hideAllAlerts();
+            hideAllLoading();
+        }
+
+        function hideAllAlerts() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.display = 'none';
+            });
+        }
+
+        function hideAllLoading() {
+            document.querySelectorAll('.loading').forEach(loading => {
+                loading.style.display = 'none';
+            });
+            document.querySelectorAll('.progress-bar').forEach(bar => {
+                bar.style.display = 'none';
+            });
+        }
+
+        // === تحسين الصور ===
+        const imageUploadArea = document.getElementById('image-upload-area');
+        const imageInput = document.getElementById('image-input');
+        const imageForm = document.getElementById('image-form');
+        const enhanceBtn = document.getElementById('enhance-btn');
+
+        // معالجة السحب والإفلات للصور
+        imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.add('dragover');
+        });
+
+        imageUploadArea.addEventListener('dragleave', () => {
+            imageUploadArea.classList.remove('dragover');
+        });
+
+        imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                handleImageSelect();
+            }
+        });
+
+        imageUploadArea.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', handleImageSelect);
+
+        function handleImageSelect() {
+            const file = imageInput.files[0];
+            if (file) {
+                if (file.size > 16 * 1024 * 1024) {
+                    showImageError('حجم الملف كبير جداً. الحد الأقصى 16 ميجابايت');
+                    return;
+                }
+                
+                enhanceBtn.disabled = false;
+                imageUploadArea.querySelector('.upload-text h3').textContent = `تم اختيار: ${file.name}`;
+                hideImageAlerts();
+            }
+        }
+
+        imageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = imageInput.files[0];
+            if (!file) {
+                showImageError('يرجى اختيار صورة أولاً');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            showImageLoading();
+            enhanceBtn.disabled = true;
+
+            try {
+                const response = await fetch('/enhance', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showImageSuccess(result.message);
+                    displayImageResults(result.original_image, result.enhanced_image);
+                } else {
+                    showImageError(result.error || 'حدث خطأ في التحسين');
+                }
+            } catch (error) {
+                showImageError('خطأ في الاتصال بالخادم: ' + error.message);
+            } finally {
+                hideImageLoading();
+                enhanceBtn.disabled = false;
+            }
+        });
+
+        function showImageLoading() {
+            document.getElementById('image-loading').style.display = 'block';
+            document.getElementById('image-progress-bar').style.display = 'block';
+            document.getElementById('image-results-section').style.display = 'none';
+            hideImageAlerts();
+            
+            simulateProgress('image-progress-fill');
+        }
+
+        function hideImageLoading() {
+            document.getElementById('image-loading').style.display = 'none';
+            document.getElementById('image-progress-bar').style.display = 'none';
+        }
+
+        function showImageSuccess(message) {
+            const alert = document.getElementById('image-success-alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            document.getElementById('image-error-alert').style.display = 'none';
+        }
+
+        function showImageError(message) {
+            const alert = document.getElementById('image-error-alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            document.getElementById('image-success-alert').style.display = 'none';
+        }
+
+        function hideImageAlerts() {
+            document.getElementById('image-success-alert').style.display = 'none';
+            document.getElementById('image-error-alert').style.display = 'none';
+        }
+
+        function displayImageResults(originalUrl, enhancedUrl) {
+            document.getElementById('original-image').src = originalUrl;
+            document.getElementById('enhanced-image').src = enhancedUrl;
+            
+            const filename = enhancedUrl.split('/').pop();
+            const downloadBtn = document.getElementById('download-btn');
+            downloadBtn.href = '/download/' + filename;
+            downloadBtn.download = filename;
+            
+            document.getElementById('image-results-section').style.display = 'block';
+            document.getElementById('image-results-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // === تحويل النص إلى كلام ===
+        const textInput = document.getElementById('text-input');
+        const textVoiceInput = document.getElementById('text-voice-input');
+        const charCount = document.getElementById('char-count');
+        const charVoiceCount = document.getElementById('char-voice-count');
+        const ttsForm = document.getElementById('tts-form');
+        const ttsVoiceForm = document.getElementById('tts-voice-form');
+        const audioUploadArea = document.getElementById('audio-upload-area');
+        const audioInput = document.getElementById('audio-input');
+        const ttsVoiceBtn = document.getElementById('tts-voice-btn');
+
+        // عداد الأحرف
+        textInput.addEventListener('input', () => {
+            charCount.textContent = textInput.value.length;
+        });
+
+        textVoiceInput.addEventListener('input', () => {
+            charVoiceCount.textContent = textVoiceInput.value.length;
+        });
+
+        // معالجة اختيار الملف الصوتي
+        audioUploadArea.addEventListener('click', () => {
+            audioInput.click();
+        });
+
+        audioInput.addEventListener('change', () => {
+            const file = audioInput.files[0];
+            if (file) {
+                if (file.size > 16 * 1024 * 1024) {
+                    showTTSError('حجم الملف كبير جداً. الحد الأقصى 16 ميجابايت');
+                    return;
+                }
+                
+                ttsVoiceBtn.disabled = false;
+                audioUploadArea.querySelector('.upload-text h3').textContent = `تم اختيار: ${file.name}`;
+                hideTTSAlerts();
+            }
+        });
+
+        // تحويل النص الأساسي
+        ttsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = textInput.value.trim();
+            if (!text) {
+                showTTSError('يرجى كتابة النص أولاً');
+                return;
+            }
+
+            showTTSLoading();
+
+            try {
+                const response = await fetch('/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showTTSSuccess(result.message);
+                    displayTTSResults(result.audio_url);
+                } else {
+                    showTTSError(result.error || 'حدث خطأ في تحويل النص');
+                }
+            } catch (error) {
+                showTTSError('خطأ في الاتصال بالخادم: ' + error.message);
+            } finally {
+                hideTTSLoading();
+            }
+        });
+
+        // تحويل النص مع الصوت المرجعي
+        ttsVoiceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = textVoiceInput.value.trim();
+            const audioFile = audioInput.files[0];
+            
+            if (!text) {
+                showTTSError('يرجى كتابة النص أولاً');
+                return;
+            }
+            
+            if (!audioFile) {
+                showTTSError('يرجى اختيار ملف صوتي أولاً');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('text', text);
+            formData.append('audio', audioFile);
+
+            showTTSLoading();
+
+            try {
+                const response = await fetch('/tts_with_voice', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showTTSSuccess(result.message);
+                    displayTTSResults(result.audio_url);
+                } else {
+                    showTTSError(result.error || 'حدث خطأ في تحويل النص');
+                }
+            } catch (error) {
+                showTTSError('خطأ في الاتصال بالخادم: ' + error.message);
+            } finally {
+                hideTTSLoading();
+                ttsVoiceBtn.disabled = false;
+            }
+        });
+
+        function showTTSLoading() {
+            document.getElementById('tts-loading').style.display = 'block';
+            document.getElementById('tts-progress-bar').style.display = 'block';
+            document.getElementById('tts-results-section').style.display = 'none';
+            hideTTSAlerts();
+            
+            simulateProgress('tts-progress-fill');
+        }
+
+        function hideTTSLoading() {
+            document.getElementById('tts-loading').style.display = 'none';
+            document.getElementById('tts-progress-bar').style.display = 'none';
+        }
+
+        function showTTSSuccess(message) {
+            const alert = document.getElementById('tts-success-alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            document.getElementById('tts-error-alert').style.display = 'none';
+        }
+
+        function showTTSError(message) {
+            const alert = document.getElementById('tts-error-alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            document.getElementById('tts-success-alert').style.display = 'none';
+        }
+
+        function hideTTSAlerts() {
+            document.getElementById('tts-success-alert').style.display = 'none';
+            document.getElementById('tts-error-alert').style.display = 'none';
+        }
+
+        function displayTTSResults(audioUrl) {
+            const audio = document.getElementById('tts-audio');
+            const audioSource = document.getElementById('tts-audio-source');
+            const downloadBtn = document.getElementById('tts-download-btn');
+            
+            audioSource.src = audioUrl;
+            audio.load();
+            
+            const filename = audioUrl.split('/').pop();
+            downloadBtn.href = audioUrl;
+            downloadBtn.download = filename;
+            
+            document.getElementById('tts-results-section').style.display = 'block';
+            document.getElementById('tts-results-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // محاكاة شريط التقدم
+        function simulateProgress(progressId) {
+            const progressFill = document.getElementById(progressId);
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+
+        // التحقق من حالة الخدمة عند تحميل الصفحة
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+                console.log('حالة الخدمات:', status);
+            } catch (error) {
+                console.log('تعذر الاتصال بالخادم');
+            }
+        });
+    </script>
+</body>
+</html>
