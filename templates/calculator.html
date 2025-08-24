@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آلة حاسبة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .calculator {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .display {
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: right;
+            font-family: monospace;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            width: 100%;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .operations {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .op-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .op-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+
+        .op-btn:active {
+            transform: translateY(0);
+        }
+
+        .clear-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #e0e0e0;
+        }
+
+        .error {
+            color: #ff4757;
+            background: #ffe3e3;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+
+            .operations {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮</h1>
+            <h1>آلة حاسبة</h1>
+            <p>قم بإجراء العمليات الحسابية الأساسية</p>
+        </div>
+        
+        <div class="content">
+            <div class="calculator">
+                <div class="display" id="display">0</div>
+                
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="num1">الرقم الأول</label>
+                        <input type="number" id="num1" placeholder="أدخل الرقم الأول">
+                    </div>
+                    <div class="input-group">
+                        <label for="num2">الرقم الثاني</label>
+                        <input type="number" id="num2" placeholder="أدخل الرقم الثاني">
+                    </div>
+                </div>
+
+                <div class="operations">
+                    <button class="op-btn" onclick="performOperation('add')">+ جمع</button>
+                    <button class="op-btn" onclick="performOperation('subtract')">- طرح</button>
+                    <button class="op-btn" onclick="performOperation('multiply')">× ضرب</button>
+                    <button class="op-btn" onclick="performOperation('divide')">÷ قسمة</button>
+                </div>
+
+                <button class="clear-btn" onclick="clearCalculator()">مسح</button>
+
+                <div class="error" id="error"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="/" class="nav-link">← العودة لتحسين الصور</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function performOperation(operation) {
+            const num1 = document.getElementById('num1').value;
+            const num2 = document.getElementById('num2').value;
+            const display = document.getElementById('display');
+            const errorDiv = document.getElementById('error');
+
+            // إخفاء رسائل الخطأ السابقة
+            errorDiv.style.display = 'none';
+
+            // التحقق من إدخال الأرقام
+            if (!num1 || !num2) {
+                showError('يرجى إدخال كلا الرقمين');
+                return;
+            }
+
+            // إرسال طلب للخادم
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    operation: operation,
+                    num1: parseFloat(num1),
+                    num2: parseFloat(num2)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    display.textContent = formatResult(data.result);
+                }
+            })
+            .catch(error => {
+                showError('خطأ في الاتصال بالخادم');
+                console.error('Error:', error);
+            });
+        }
+
+        function formatResult(result) {
+            // تنسيق النتيجة لعرض الأرقام العشرية بشكل مناسب
+            if (Number.isInteger(result)) {
+                return result.toString();
+            } else {
+                return parseFloat(result.toFixed(8)).toString();
+            }
+        }
+
+        function clearCalculator() {
+            document.getElementById('num1').value = '';
+            document.getElementById('num2').value = '';
+            document.getElementById('display').textContent = '0';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // إضافة مستمع للأحداث للضغط على Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                // تنفيذ آخر عملية تم النقر عليها (افتراضياً الجمع)
+                performOperation('add');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -150,6 +150,42 @@ def output_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/calculator')
+def calculator():
+    """آلة حاسبة"""
+    return render_template('calculator.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    """إجراء العمليات الحسابية"""
+    try:
+        data = request.get_json()
+        operation = data.get('operation')
+        num1 = float(data.get('num1', 0))
+        num2 = float(data.get('num2', 0))
+        
+        result = None
+        
+        if operation == 'add':
+            result = num1 + num2
+        elif operation == 'subtract':
+            result = num1 - num2
+        elif operation == 'multiply':
+            result = num1 * num2
+        elif operation == 'divide':
+            if num2 == 0:
+                return jsonify({'error': 'لا يمكن القسمة على صفر'}), 400
+            result = num1 / num2
+        else:
+            return jsonify({'error': 'عملية غير مدعومة'}), 400
+        
+        return jsonify({'result': result})
+        
+    except (ValueError, TypeError):
+        return jsonify({'error': 'قيم غير صحيحة'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/status')
 def health_check():
     """التحقق من حالة الخدمة"""
